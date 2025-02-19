@@ -22,31 +22,15 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, index){
                     return ListTile(
                       leading: const CircleAvatar(
-                        backgroundImage: AssetImage("assets/singer_placeholder.png"),
+                        backgroundImage: AssetImage("images/personph.png"),
                       ),
                       title: const Text("Song name"),
                       subtitle: const Text("Singer Name"),
                     );
-                  }))
+                  }),
+          ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 0,
-          onTap: (index){
-          },
-          items: const [
-            BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: "Home"),
-
-          BottomNavigationBarItem(
-          icon: Icon(Icons.history),
-          label: "History"),
-
-          BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: "settings"),
-          ]),
     );
   }
 }

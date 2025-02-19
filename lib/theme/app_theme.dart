@@ -37,6 +37,11 @@ class AppTheme {
         ),
       ),
     ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.white,
+      selectedItemColor: Colors.blue,
+      unselectedItemColor: Colors.grey,
+    ),
   );
 
   static final ThemeData darkTheme = ThemeData(
@@ -65,6 +70,11 @@ class AppTheme {
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
       ),
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF1E1E1E),
+      selectedItemColor: Colors.blue,
+      unselectedItemColor: Colors.grey,
     ),
   );
 }
