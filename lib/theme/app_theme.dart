@@ -38,8 +38,8 @@ class AppTheme {
       ),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Colors.white,
-      selectedItemColor: Colors.blue,
+      backgroundColor: lightBackgroundColor,
+      selectedItemColor: lightTextColor,
       unselectedItemColor: Colors.grey,
     ),
   );
@@ -72,8 +72,8 @@ class AppTheme {
       ),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF1E1E1E),
-      selectedItemColor: Colors.blue,
+      backgroundColor: darkPrimaryColor,
+      selectedItemColor: darkTextColor,
       unselectedItemColor: Colors.grey,
     ),
   );
