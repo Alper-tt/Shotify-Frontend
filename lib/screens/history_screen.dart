@@ -6,7 +6,7 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("History")),
+      appBar: AppBar(title: const Text("History"), centerTitle: true,),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: GridView.builder(
@@ -14,7 +14,7 @@ class HistoryScreen extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 9 / 16, // Story oranı
+            childAspectRatio: 9 / 16,
           ),
           itemCount: 10,
           itemBuilder: (context, index) {
@@ -25,7 +25,7 @@ class HistoryScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   image: const DecorationImage(
-                    image: AssetImage("assets/images/storyph.png"), // Placeholder
+                    image: AssetImage("assets/images/storyph.png"),
                     fit: BoxFit.cover,
                   ),
                 ),

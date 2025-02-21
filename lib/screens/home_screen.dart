@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../services/photo_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   File? _selectedImage;
+  List<Map<String, String>> _songs = [];
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -53,10 +55,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _uploadAndAnalyzePhoto() async {
+    if (_selectedImage != null) {
+      PhotoService photoService = PhotoService();
+      int? photoId = await photoService.uploadPhoto(_selectedImage!);
+
+      if (photoId != null) {
+        print("Fotoğraf başarıyla yüklendi. Photo ID: $photoId");
+
+        var analysisResponse = await photoService.analyzePhoto(photoId);
+        if (analysisResponse != null) {
+          setState(() {
+            _songs = (analysisResponse["songs"] as List)
+                .map((song) => {
+              "songTitle": song["songTitle"] as String,
+              "songArtist": song["songArtist"] as String
+            })
+                .toList();
+          });
+          print("Analiz sonucu: $_songs");
+        }
+      }
+    } else {
+      print("Lütfen bir fotoğraf seçin!");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Shotify")),
+      appBar: AppBar(title: const Text("Shotify"), centerTitle: true,),
       body: Column(
         children: [
           Padding(
@@ -83,7 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         image: DecorationImage(
-                          colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.saturation),
                           image: _selectedImage != null
                               ? FileImage(_selectedImage!) as ImageProvider
                               : const AssetImage("assets/images/storyph.png"),
@@ -119,18 +146,15 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Center(
-              child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 50,
-                color: Colors.teal,
-                child: const Text("Here you go! Suggestions for your photo..."),
+              child: ElevatedButton(
+                onPressed: _uploadAndAnalyzePhoto,
+                child: const Text("Upload & Analyze Photo"),
               ),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: 10,
+              itemCount: _songs.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: ClipRRect(
@@ -146,8 +170,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 45.0,
                     ),
                   ),
-                  title: const Text("Song name"),
-                  subtitle: const Text("Singer Name"),
+                  title: Text(_songs[index]["songTitle"] ?? "Unknown Song"),
+                  subtitle: Text(_songs[index]["songArtist"] ?? "Unknown Artist"),
                 );
               },
             ),
