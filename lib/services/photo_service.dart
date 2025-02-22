@@ -24,17 +24,18 @@ class PhotoService {
   }
 
   Future<Map<String, dynamic>?> analyzePhoto(int photoId) async {
-    var uri = Uri.parse("$baseUrl/integration/analyze-photo");
-    var response = await http.post(
-      uri,
+    final url = Uri.parse('http://10.0.2.2:8080/integration/analyze-photo');
+    final response = await http.post(
+      url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"photoId": photoId}),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decodedResponse = json.decode(utf8.decode(response.bodyBytes));
+      return decodedResponse;
     } else {
-      print("Fotoğraf analizi başarısız: ${response.statusCode}");
+      print("Fotoğraf analizi başarısız: ${response.body}");
       return null;
     }
   }

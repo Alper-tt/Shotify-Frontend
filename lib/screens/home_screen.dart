@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:shotify_frontend/services/photo_provider.dart';
 import 'dart:io';
 import '../services/photo_service.dart';
 
@@ -11,15 +13,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  File? _selectedImage;
   List<Map<String, String>> _songs = [];
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      Provider.of<PhotoProvider>(context, listen: false).setImage(File(pickedFile.path));
     }
   }
 
@@ -56,24 +55,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _uploadAndAnalyzePhoto() async {
-    if (_selectedImage != null) {
+    var photoProvider = Provider.of<PhotoProvider>(context, listen: false);
+
+    if (photoProvider.selectedImage != null) { // ❌ _selectedImage yerine bunu kullan!
       PhotoService photoService = PhotoService();
-      int? photoId = await photoService.uploadPhoto(_selectedImage!);
+      int? photoId = await photoService.uploadPhoto(photoProvider.selectedImage!);
 
       if (photoId != null) {
         print("Fotoğraf başarıyla yüklendi. Photo ID: $photoId");
 
         var analysisResponse = await photoService.analyzePhoto(photoId);
         if (analysisResponse != null) {
-          setState(() {
-            _songs = (analysisResponse["songs"] as List)
-                .map((song) => {
+          photoProvider.setSongs(
+            (analysisResponse["songs"] as List).map((song) => {
               "songTitle": song["songTitle"] as String,
               "songArtist": song["songArtist"] as String
-            })
-                .toList();
-          });
-          print("Analiz sonucu: $_songs");
+            }).toList(),
+          );
+          print("Analiz sonucu: ${photoProvider.songs}");
         }
       }
     } else {
@@ -81,8 +80,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    var photoProvider = Provider.of<PhotoProvider>(context);
     return Scaffold(
       appBar: AppBar(title: const Text("Shotify"), centerTitle: true,),
       body: Column(
@@ -111,14 +112,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         image: DecorationImage(
-                          image: _selectedImage != null
-                              ? FileImage(_selectedImage!) as ImageProvider
+                          image: photoProvider.selectedImage != null
+                              ? FileImage(photoProvider.selectedImage!) as ImageProvider
                               : const AssetImage("assets/images/storyph.png"),
                           fit: BoxFit.fitWidth,
                         ),
                       ),
                     ),
-                    if (_selectedImage == null)
+                    if (photoProvider.selectedImage == null)
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -154,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _songs.length,
+              itemCount: photoProvider.songs.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: ClipRRect(
@@ -170,8 +171,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 45.0,
                     ),
                   ),
-                  title: Text(_songs[index]["songTitle"] ?? "Unknown Song"),
-                  subtitle: Text(_songs[index]["songArtist"] ?? "Unknown Artist"),
+                  title: Text(photoProvider.songs[index]["songTitle"] ?? "Unknown Song"),
+                  subtitle: Text(photoProvider.songs[index]["songArtist"] ?? "Unknown Artist"),
                 );
               },
             ),
