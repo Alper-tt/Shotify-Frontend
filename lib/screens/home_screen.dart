@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _uploadAndAnalyzePhoto() async {
     var photoProvider = Provider.of<PhotoProvider>(context, listen: false);
 
-    if (photoProvider.selectedImage != null) { // ❌ _selectedImage yerine bunu kullan!
+    if (photoProvider.selectedImage != null) {
       PhotoService photoService = PhotoService();
       int? photoId = await photoService.uploadPhoto(photoProvider.selectedImage!);
 
