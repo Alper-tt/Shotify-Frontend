@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import '../widgets/artist_photo_widget.dart';
 
 class Photo {
   final int photoId;
@@ -70,7 +71,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return const Center(child: Text("Error loading recommendations"));
+                  return const Center(
+                      child: Text("Error loading recommendations"));
                 } else if (!snapshot.hasData) {
                   return const Center(child: Text("No recommendations found"));
                 }
@@ -78,9 +80,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 var songs = data["songs"] as List<dynamic>;
 
                 return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
@@ -97,7 +96,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       const SizedBox(height: 16),
                       const Text(
                         "Song Recommendations",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const Divider(),
                       Expanded(
@@ -107,21 +107,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           itemBuilder: (context, index) {
                             var song = songs[index];
                             return ListTile(
-                              leading: ClipRRect(
-                                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    image: DecorationImage(
-                                      fit: BoxFit.fitHeight,
-                                      image: AssetImage("assets/images/tarkanph.png"),
-                                    ),
-                                  ),
-                                  height: 45.0,
-                                  width: 45.0,
-                                ),
-                              ),
-                              title: Text(song["songTitle"] ?? "Unknown Song"),
-                              subtitle: Text(song["songArtist"] ?? "Unknown Artist"),
+                              leading: ArtistPhotoWidget(
+                                  artistName: song["songArtist"] ??
+                                      "Unknown Artist"),
+                              title:
+                              Text(song["songTitle"] ?? "Unknown Song"),
+                              subtitle:
+                              Text(song["songArtist"] ?? "Unknown Artist"),
                             );
                           },
                         ),

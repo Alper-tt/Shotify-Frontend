@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shotify_frontend/services/photo_provider.dart';
 import 'dart:io';
 import '../services/photo_service.dart';
+import '../widgets/artist_photo_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -158,19 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: photoProvider.songs.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  leading: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          fit: BoxFit.fitHeight,
-                          image: AssetImage("assets/images/tarkanph.png"),
-                        ),
-                      ),
-                      height: 45.0,
-                      width: 45.0,
-                    ),
-                  ),
+                  leading: ArtistPhotoWidget(artistName: photoProvider.songs[index]["songArtist"] ?? "Unknown Artist"),
                   title: Text(photoProvider.songs[index]["songTitle"] ?? "Unknown Song"),
                   subtitle: Text(photoProvider.songs[index]["songArtist"] ?? "Unknown Artist"),
                 );
