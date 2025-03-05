@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shotify_frontend/services/photo_provider.dart';
 import 'dart:io';
+import '../services/audio_player_service.dart';
 import '../services/photo_service.dart';
 import '../widgets/artist_photo_widget.dart';
 
@@ -15,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, String>> _songs = [];
+  final audioPlayerService = AudioPlayerService();
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -162,6 +164,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   leading: ArtistPhotoWidget(artistName: photoProvider.songs[index]["songArtist"] ?? "Unknown Artist"),
                   title: Text(photoProvider.songs[index]["songTitle"] ?? "Unknown Song"),
                   subtitle: Text(photoProvider.songs[index]["songArtist"] ?? "Unknown Artist"),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.play_arrow),
+                    onPressed: () async {
+                      final artist = photoProvider.songs[index]["songArtist"] ?? "Unknown Artist";
+                      final title = photoProvider.songs[index]["songTitle"] ?? "Unknown Song";
+                      await audioPlayerService.playSong(artist,title);
+                    },
+                  ),
                 );
               },
             ),

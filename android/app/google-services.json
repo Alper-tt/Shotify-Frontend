@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "402660941765",
+    "project_id": "shotify-d5ae8",
+    "storage_bucket": "shotify-d5ae8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:402660941765:android:0bb10488c1fde52564f5ac",
+        "android_client_info": {
+          "package_name": "com.example.shotify_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBT9sQ6N_99aVQT3H0kJJWsH0pyBI9qE9g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
