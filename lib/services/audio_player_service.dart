@@ -1,6 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../utils/song_utils.dart';
+
 class AudioPlayerService {
   static final AudioPlayerService _instance = AudioPlayerService._internal();
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -13,7 +15,7 @@ class AudioPlayerService {
 
   Future<void> playSong(String artist, String songTitle) async {
     try {
-      final songUrl = await getSongUrlFromArtistAndTitle(artist, songTitle);
+      final songUrl = await getSongUrl(artist, songTitle);
       await _audioPlayer.stop();
       await _audioPlayer.play(UrlSource(songUrl));
     } catch (e) {
@@ -38,16 +40,8 @@ class AudioPlayerService {
   }
 }
 
-String normalizeSongName(String artist, String title) {
-  return "${artist.trim().toLowerCase().replaceAll(' ', '_')}_${title.toLowerCase().trim().replaceAll(' ', '_')}.mp3";
-}
-
-Future<String> getSongUrl(String fileName) async {
-  Reference ref = FirebaseStorage.instance.ref().child("preview_musics/$fileName");
+Future<String> getSongUrl(String artist, String title) async {
+  String url = getSongUrlFromArtistAndTitle(artist, title);
+  Reference ref = FirebaseStorage.instance.ref().child(url);
   return await ref.getDownloadURL();
-}
-
-Future<String> getSongUrlFromArtistAndTitle(String artist, String title) async {
-  final fileName = normalizeSongName(artist, title);
-  return await getSongUrl(fileName);
 }
