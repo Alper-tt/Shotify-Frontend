@@ -1,22 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:shotify_frontend/services/photo_service.dart';
+import 'package:shotify_frontend/services/recommendation_service.dart';
+import 'package:shotify_frontend/services/audio_player_service.dart';
 import '../widgets/artist_photo_widget.dart';
-
-class Photo {
-  final int photoId;
-  final String url;
-
-  Photo({required this.photoId, required this.url});
-
-  factory Photo.fromJson(Map<String, dynamic> json) {
-    return Photo(
-      photoId: json["photoId"],
-      url: "http://10.0.2.2:8080${json['url']}",
-    );
-  }
-}
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -26,29 +14,9 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  Future<List<Photo>> fetchPhotos() async {
-    final response =
-    await http.get(Uri.parse("http://10.0.2.2:8080/users/1/photos"));
-
-    if (response.statusCode == 200) {
-      List<dynamic> jsonData = jsonDecode(response.body);
-      List<Photo> photos =
-      jsonData.map((photoJson) => Photo.fromJson(photoJson)).toList();
-      return photos;
-    } else {
-      throw Exception("Failed to load photos");
-    }
-  }
-
-  Future<Map<String, dynamic>> fetchRecommendations(int photoId) async {
-    final response = await http.get(
-        Uri.parse("http://10.0.2.2:8080/recommendations/photo/$photoId"));
-    if (response.statusCode == 200) {
-      return jsonDecode(utf8.decode(response.bodyBytes));
-    } else {
-      throw Exception("Failed to load recommendations");
-    }
-  }
+  final PhotoService _photoService = PhotoService();
+  final RecommendationService _recommendationService = RecommendationService();
+  final AudioPlayerService _audioPlayerService = AudioPlayerService();
 
   void showRecommendationsBottomSheet(BuildContext context, Photo photo) {
     showModalBottomSheet(
@@ -66,7 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           expand: false,
           builder: (context, scrollController) {
             return FutureBuilder<Map<String, dynamic>>(
-              future: fetchRecommendations(photo.photoId),
+              future: _recommendationService.fetchRecommendations(photo.photoId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -114,6 +82,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               Text(song["songTitle"] ?? "Unknown Song"),
                               subtitle:
                               Text(song["songArtist"] ?? "Unknown Artist"),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.play_arrow),
+                                onPressed: () async {
+                                  final artist =
+                                      song["songArtist"] ?? "Unknown Artist";
+                                  final title =
+                                      song["songTitle"] ?? "Unknown Song";
+                                  await _audioPlayerService.playSong(
+                                      artist, title);
+                                },
+                              ),
                             );
                           },
                         ),
@@ -126,7 +105,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           },
         );
       },
-    );
+    ).whenComplete(() async {
+      await _audioPlayerService.stopSong();
+    });
   }
 
   @override
@@ -139,7 +120,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: FutureBuilder<List<Photo>>(
-          future: fetchPhotos(),
+          future: _photoService.fetchPhotos(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -149,6 +130,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               return const Center(child: Text("No photos found"));
             }
             var photos = snapshot.data!;
+            photos = photos.reversed.toList();
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
