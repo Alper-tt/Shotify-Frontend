@@ -6,7 +6,7 @@ import 'package:shotify_frontend/screens/main_screen.dart';
 import 'package:shotify_frontend/services/photo_provider.dart';
 import 'theme/app_theme.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if(kIsWeb)
