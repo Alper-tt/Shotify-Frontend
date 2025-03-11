@@ -1,33 +1,66 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shotify_frontend/services/audio_player_service.dart';
 
+class VideoService {
+  Future<String?> createVideo(String photoPath, String artist, String title) async {
+    print("Photo path: $photoPath");
 
-class VideoService{
+    String audioPath = await AudioPlayerService().getSongUrl(artist, title);
 
+    final response = await http.post(
+      Uri.parse("http://10.0.2.2:8080/video/create"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"photoPath": photoPath, "audioUrl": audioPath}),
+    );
 
-  Future<String> createVideo(String imagePath, String artist, String title) async {
-    String audioPath = await AudioPlayerService().downloadAudioFile(artist, title);
-
-    final Directory tempDir = await getTemporaryDirectory();
-    final String outputPath = '${tempDir.path}/output_video.mp4';
-
-    final String command = '-loop 1 -i "$imagePath" -i "$audioPath" -c:v libx264 -tune stillimage -c:a aac -b:a 192k -pix_fmt yuv420p -shortest "$outputPath"';
-
-    //await FFmpegKit.execute(command);
-
-    return outputPath;
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> decoded = json.decode(utf8.decode(response.bodyBytes));
+      return decoded["videoUrl"];
+    } else {
+      print("Video URL'si alınamadı: ${response.body}");
+      return null;
+    }
   }
 
-  void saveVideoToGallery(String videoPath) async {
-    await FlutterImageGallerySaver.saveFile(videoPath);
-    print("Video galeride kaydedildi: $videoPath");
+  Future<String> downloadVideo(String videoUrl) async {
+    final response = await http.get(Uri.parse(videoUrl));
+    if (response.statusCode == 200) {
+      final tempDir = await getTemporaryDirectory();
+      final filePath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+      final file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filePath;
+    } else {
+      throw Exception('Video indirme başarısız: ${response.statusCode}');
+    }
   }
 
-  void shareVideo(String videoPath) {
-    Share.shareXFiles([XFile(videoPath)], text: 'Check out this cool video!');
+  Future<void> saveVideoToGallery(String videoFilePath) async {
+    await FlutterImageGallerySaver.saveFile(videoFilePath);
   }
 
+  Future<void> shareVideo(String videoFilePath) async {
+    await Share.shareXFiles([XFile(videoFilePath)], text: 'Check out this cool video!');
+  }
+
+  Future<void> processVideo(String videoUrl, {required String action}) async {
+    try {
+      String videoFilePath = await downloadVideo(videoUrl);
+      if (action == "save") {
+        await saveVideoToGallery(videoFilePath);
+      } else if (action == "share") {
+        await shareVideo(videoFilePath);
+      }
+      if (await File(videoFilePath).exists()) {
+        await File(videoFilePath).delete();
+      }
+    } catch (e) {
+      throw Exception('Video işlemi sırasında hata oluştu: $e');
+    }
+  }
 }
