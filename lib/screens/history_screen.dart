@@ -56,7 +56,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           image: DecorationImage(
-                            image: NetworkImage(photo.url),
+                            image: NetworkImage(photo.photoUrl),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -147,7 +147,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       image: DecorationImage(
-                        image: NetworkImage(photo.url),
+                        image: NetworkImage(photo.photoUrl),
                         fit: BoxFit.cover,
                       ),
                     ),

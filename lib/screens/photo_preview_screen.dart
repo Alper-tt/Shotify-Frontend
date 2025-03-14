@@ -111,8 +111,8 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        String imagePath = photoProvider.selectedImage!.path;
-                        String? videoUrl = await videoService.createVideo(imagePath, widget.artist, widget.title);
+                        String? photoUrl = photoProvider.firebasePhotoUrl;
+                        String? videoUrl = await videoService.createVideo(photoUrl!, widget.artist, widget.title);
                         videoService.processVideo(videoUrl!, action: "save");
                       },
                       child: const Text("Save to Phone"),
@@ -122,8 +122,8 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        String? imagePath = photoProvider.selectedImage!.path;
-                        String? videoUrl = await videoService.createVideo(imagePath, widget.artist, widget.title);
+                        String? photoUrl = photoProvider.firebasePhotoUrl;
+                        String? videoUrl = await videoService.createVideo(photoUrl!, widget.artist, widget.title);
                         videoService.processVideo(videoUrl!, action: "share");
                       },
                       child: const Text("Share"),

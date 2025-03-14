@@ -7,15 +7,16 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shotify_frontend/services/audio_player_service.dart';
 
 class VideoService {
-  Future<String?> createVideo(String photoPath, String artist, String title) async {
-    print("Photo path: $photoPath");
+  Future<String?> createVideo(String photoUrl, String artist, String title) async {
+    print("Photo path: $photoUrl");
 
     String audioPath = await AudioPlayerService().getSongUrl(artist, title);
+    print(photoUrl);
 
     final response = await http.post(
       Uri.parse("http://10.0.2.2:8080/video/create"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"photoPath": photoPath, "audioUrl": audioPath}),
+      body: jsonEncode({"photoPath": photoUrl, "audioUrl": audioPath}),
     );
 
     if (response.statusCode == 200) {

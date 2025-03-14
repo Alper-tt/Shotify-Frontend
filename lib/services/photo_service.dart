@@ -1,17 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:shotify_frontend/services/photo_provider.dart';
 
 class Photo {
   final int photoId;
-  final String url;
+  final String photoUrl;
 
-  Photo({required this.photoId, required this.url});
+  Photo({required this.photoId, required this.photoUrl});
 
   factory Photo.fromJson(Map<String, dynamic> json) {
     return Photo(
       photoId: json["photoId"],
-      url: "http://10.0.2.2:8080${json['url']}",
+      photoUrl: json['photoUrl'],
     );
   }
 }
@@ -22,8 +25,9 @@ class PhotoService {
     'http://10.0.2.2:8080/integration/analyze-photo',
   );
   int? photoId;
+  String? photoUrl;
 
-  Future<Map<String, dynamic>?> uploadAndAnalyzePhoto(File imageFile) async {
+  Future<Map<String, dynamic>?> uploadAndAnalyzePhoto(File imageFile, BuildContext context) async {
     var uri = Uri.parse("$uploadUrl/photos");
 
     var request =
@@ -36,6 +40,8 @@ class PhotoService {
       var responseData = await response.stream.bytesToString();
       var jsonResponse = jsonDecode(responseData);
       photoId = jsonResponse["photoId"];
+      photoUrl = jsonResponse["url"];
+      Provider.of<PhotoProvider>(context,listen: false).setFirebasePhotoUrl(photoUrl!);
     } else {
       print("Fotoğraf yükleme başarısız: ${response.statusCode}");
       return null;

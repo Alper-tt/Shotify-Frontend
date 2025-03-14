@@ -27,7 +27,7 @@ class _UploadAnalyzeButtonState extends State<UploadAnalyzeButton> {
     });
 
     PhotoService photoService = PhotoService();
-    final response = await photoService.uploadAndAnalyzePhoto(photoProvider.selectedImage!);
+    final response = await photoService.uploadAndAnalyzePhoto(photoProvider.selectedImage!, context);
 
     if (response != null) {
       photoProvider.setSongs(
