@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(bool) onThemeChanged;
@@ -67,6 +69,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.description),
             title: const Text("Terms of use"),
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text("Log out"),
+            onTap: ()
+           {GoogleSignIn().signOut();
+             FirebaseAuth.instance.signOut();} ,
           ),
         ],
       ),

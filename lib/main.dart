@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shotify_frontend/screens/main_screen.dart';
+import 'package:shotify_frontend/services/auth_service.dart';
 import 'package:shotify_frontend/services/photo_provider.dart';
 import 'theme/app_theme.dart';
 
@@ -23,7 +24,7 @@ void main() async {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => PhotoProvider())],
+      providers: [ChangeNotifierProvider(create: (context) => PhotoProvider()),Provider<AuthService>(create: (context) => AuthService())],
       child: const MyApp(),
     ),
   );
