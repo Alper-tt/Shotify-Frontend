@@ -48,6 +48,7 @@ dependencies:
   rounded_loading_button: ^2.1.0
   email_validator: ^3.0.0
   flutter_signin_button: ^2.0.0
+  shared_preferences: ^2.5.2
 
 
 dev_dependencies:

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:shotify_frontend/services/backend_auth_service.dart';
 
 import '../services/auth_service.dart';
 
@@ -25,14 +26,13 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Sign in Email"),
-      ),
+      appBar: AppBar(title: Text("Sign in Email")),
       body: Center(
         child: SingleChildScrollView(
-          child: _formStatus == formStatus.signIn
-              ? buildSignInForm()
-              : _formStatus == formStatus.register
+          child:
+              _formStatus == formStatus.signIn
+                  ? buildSignInForm()
+                  : _formStatus == formStatus.register
                   ? buildRegisterForm()
                   : buildResetForm(),
         ),
@@ -59,9 +59,7 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.only(left: 20, right: 30),
               child: TextFormField(
@@ -79,7 +77,8 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                   hintText: "Email Address...",
                   prefixIcon: Icon(Icons.email_outlined),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
               ),
             ),
@@ -97,10 +96,12 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 textAlign: TextAlign.center,
                 obscureText: true,
                 decoration: InputDecoration(
-                    hintText: "Password...",
-                    prefixIcon: Icon(Icons.lock_outline),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50))),
+                  hintText: "Password...",
+                  prefixIcon: Icon(Icons.lock_outline),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 10),
@@ -119,18 +120,26 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
               onPressed: () async {
                 if (_signInFormKey.currentState!.validate()) {
                   try {
-                    final user = await Provider.of<AuthService>(context, listen: false)
-                        .signInWithEmailAndPassword(
-                            _emailController.text, _passwordController.text);
+                    final user = await Provider.of<AuthService>(
+                      context,
+                      listen: false,
+                    ).signInWithEmailAndPassword(
+                      _emailController.text,
+                      _passwordController.text,
+                    );
+
+                    Provider.of<BackendAuthService>(context, listen: false)
+                        .syncUserWithBackend(user!);
 
                     Timer(Duration(seconds: 1), () async {
                       Navigator.pop(context);
                     });
                   } on FirebaseAuthException catch (e) {
                     _showMyDialog(
-                        "Something Went Wrong!",
-                        '${e.message}',
-                        "Try Again");
+                      "Something Went Wrong!",
+                      '${e.message}',
+                      "Try Again",
+                    );
                     _buttonController.error();
                   }
                 } else {
@@ -153,15 +162,16 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
               ),
             ),
             TextButton(
-                onPressed: () {
-                  setState(() {
-                    _formStatus = formStatus.reset;
-                  });
-                },
-                child: Text(
-                  "You forgot your password?",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ))
+              onPressed: () {
+                setState(() {
+                  _formStatus = formStatus.reset;
+                });
+              },
+              child: Text(
+                "You forgot your password?",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
           ],
         ),
       ),
@@ -187,9 +197,7 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.only(left: 20, right: 30),
               child: TextFormField(
@@ -200,6 +208,7 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                   } else {
                     null;
                   }
+                  return null;
                 },
                 keyboardType: TextInputType.emailAddress,
                 textAlign: TextAlign.center,
@@ -207,7 +216,8 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                   hintText: "Email Address...",
                   prefixIcon: Icon(Icons.email_outlined),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
               ),
             ),
@@ -275,10 +285,16 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 onPressed: () async {
                   try {
                     if (_registerFormKey.currentState!.validate()) {
-                      final user = await Provider.of<AuthService>(context,
-                              listen: false)
-                          .createUserWithEmailAndPassword(
-                              _emailController.text, _passwordController.text);
+                      final user = await Provider.of<AuthService>(
+                        context,
+                        listen: false,
+                      ).createUserWithEmailAndPassword(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+
+                      Provider.of<BackendAuthService>(context, listen: false)
+                          .syncUserWithBackend(user!);
 
                       _buttonController.success();
 
@@ -291,7 +307,11 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                       });
                     }
                   } on FirebaseAuthException catch (e) {
-                    _showMyDialog("Something Went Wrong!", '${e.message}', "Try Again");
+                    _showMyDialog(
+                      "Something Went Wrong!",
+                      '${e.message}',
+                      "Try Again",
+                    );
                   }
                 },
                 child: Text("Register"),
@@ -300,12 +320,13 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
             Padding(
               padding: EdgeInsets.only(left: 10.0),
               child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _formStatus = formStatus.signIn;
-                    });
-                  },
-                  child: Text("Are You Already Registered?")),
+                onPressed: () {
+                  setState(() {
+                    _formStatus = formStatus.signIn;
+                  });
+                },
+                child: Text("Are You Already Registered?"),
+              ),
             ),
           ],
         ),
@@ -331,9 +352,7 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.only(left: 20, right: 30),
               child: TextFormField(
@@ -351,7 +370,8 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                   hintText: "Email Address...",
                   prefixIcon: Icon(Icons.email_outlined),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
               ),
             ),
@@ -373,21 +393,27 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
                 onPressed: () async {
                   if (_resetFormKey.currentState!.validate()) {
                     try {
-                      await Provider.of<AuthService>(context, listen: false)
-                          .sendPasswordResetEmail(_emailController.text);
+                      await Provider.of<AuthService>(
+                        context,
+                        listen: false,
+                      ).sendPasswordResetEmail(_emailController.text);
 
                       _buttonController.success();
                       await _showMyDialog(
-                          'Reset Password',
-                          'Hi, please check your mail box.\nYou should click the link then reset your password.',
-                          'Got it');
+                        'Reset Password',
+                        'Hi, please check your mail box.\nYou should click the link then reset your password.',
+                        'Got it',
+                      );
                       Timer(Duration(seconds: 1), () {
                         Navigator.pop(context);
                       });
                     } on FirebaseAuthException catch (e) {
                       _buttonController.error();
-                      _showMyDialog('Something Went Wrong!',
-                          '${e.message}', "Try Again");
+                      _showMyDialog(
+                        'Something Went Wrong!',
+                        '${e.message}',
+                        "Try Again",
+                      );
                     }
                   } else {
                     Timer(Duration(seconds: 1), () {
@@ -405,7 +431,10 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
   }
 
   Future<void> _showMyDialog(
-      String title, String content, String buttonText) async {
+    String title,
+    String content,
+    String buttonText,
+  ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -413,11 +442,7 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
         return AlertDialog(
           title: Text(title),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(content),
-              ],
-            ),
+            child: ListBody(children: <Widget>[Text(content)]),
           ),
           actions: <Widget>[
             ElevatedButton(

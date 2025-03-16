@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shotify_frontend/services/backend_auth_service.dart';
 import 'package:shotify_frontend/services/photo_provider.dart';
+
 
 class Photo {
   final int photoId;
@@ -14,7 +16,7 @@ class Photo {
   factory Photo.fromJson(Map<String, dynamic> json) {
     return Photo(
       photoId: json["photoId"],
-      photoUrl: json['photoUrl'],
+      photoUrl: json["url"],
     );
   }
 }
@@ -31,9 +33,9 @@ class PhotoService {
     var uri = Uri.parse("$uploadUrl/photos");
 
     var request =
-        http.MultipartRequest("POST", uri)
-          ..files.add(await http.MultipartFile.fromPath("file", imageFile.path))
-          ..fields["requestDTO"] = jsonEncode({"userId": 1});
+    http.MultipartRequest("POST", uri)
+      ..files.add(await http.MultipartFile.fromPath("file", imageFile.path))
+      ..fields["requestDTO"] = jsonEncode({"userId": 1});
 
     var response = await request.send();
     if (response.statusCode == 201) {
@@ -65,16 +67,22 @@ class PhotoService {
   }
 
   Future<List<Photo>> fetchPhotos() async {
-    final response =
-    await http.get(Uri.parse("http://10.0.2.2:8080/users/1/photos"));
+    int? userId = await BackendAuthService().getUserId();
+
+    if (userId == null) {
+      throw Exception("User ID bulunamadı!");
+    }
+
+    final response = await http.get(Uri.parse("http://10.0.2.2:8080/users/$userId/photos"));
+    print(response.body);
 
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
-      List<Photo> photos =
-      jsonData.map((photoJson) => Photo.fromJson(photoJson)).toList();
+      List<Photo> photos = jsonData.map((photoJson) => Photo.fromJson(photoJson)).toList();
       return photos;
     } else {
       throw Exception("Failed to load photos");
     }
   }
+
 }

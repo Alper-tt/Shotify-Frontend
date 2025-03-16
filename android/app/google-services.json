@@ -12,7 +12,20 @@
           "package_name": "com.example.shotify_frontend"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "402660941765-fpdq2djurl83dttjckrm48qt161p3ik7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.shotify_frontend",
+            "certificate_hash": "e005cb7a190cedd3957d3f51482dc50ff5725abb"
+          }
+        },
+        {
+          "client_id": "402660941765-l9n6en18kpbvmeo2gqg4o8g0e7ido54h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBT9sQ6N_99aVQT3H0kJJWsH0pyBI9qE9g"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "402660941765-2g1qsa2at1v04v3fbgbjl01bhksh4b27.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "402660941765-r9v13gni5nt3babqfv3ijmkcclhmmbv8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shotifyFrontend"
+              }
+            }
+          ]
         }
       }
     }

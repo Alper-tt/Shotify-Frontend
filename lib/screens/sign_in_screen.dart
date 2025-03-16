@@ -5,6 +5,7 @@ import 'package:flutter_signin_button/button_list.dart';
 import 'package:provider/provider.dart';
 
 import '../services/auth_service.dart';
+import '../services/backend_auth_service.dart';
 import '../widgets/sign_button.dart';
 import 'email_sign_in_screen.dart';
 
@@ -22,7 +23,16 @@ class _SignInPageState extends State<SignInPage> {
     });
 
     final user =
-        await Provider.of<AuthService>(context, listen: false).signInAnonymously();
+        await Provider.of<AuthService>(
+          context,
+          listen: false,
+        ).signInAnonymously();
+
+    Provider.of<BackendAuthService>(
+      context,
+      listen: false,
+    ).syncUserWithBackend(user!);
+
     setState(() {
       _isLoading = false;
     });
@@ -35,7 +45,14 @@ class _SignInPageState extends State<SignInPage> {
       });
 
       final user =
-          await Provider.of<AuthService>(context, listen: false).signInWithGoogle();
+          await Provider.of<AuthService>(
+            context,
+            listen: false,
+          ).signInWithGoogle();
+      Provider.of<BackendAuthService>(
+        context,
+        listen: false,
+      ).syncUserWithBackend(user!);
     } on FirebaseAuthException catch (e) {
       _showMyDialog("Something Went Wrong!", "${e.message}", 'Try Again');
     } finally {
@@ -55,7 +72,7 @@ class _SignInPageState extends State<SignInPage> {
             onPressed: () async {
               Provider.of<AuthService>(context, listen: false).signOut();
             },
-          )
+          ),
         ],
       ),
       body: Center(
@@ -65,25 +82,30 @@ class _SignInPageState extends State<SignInPage> {
             Text("Sign In Page", style: TextStyle(fontSize: 25)),
             SizedBox(height: 30),
             SizedBox(
-                height: 50,
-                width: 250,
-                child: SignInButtonBuilder(
-                    icon: Icons.person,
-                    backgroundColor:
-                        _isLoading ? Colors.teal.withOpacity(0.3) : Colors.teal,
-                    onPressed: () {
-                      if (_isLoading) {
-                        null;
-                      } else {
-                        try {
-                          _signInAnonymously();
-                        } on FirebaseAuthException catch (e) {
-                          _showMyDialog("Something Went Wrong", '${e.message}',
-                              'Try Again');
-                        }
-                      }
-                    },
-                    text: "Sign in Anonymously")),
+              height: 50,
+              width: 250,
+              child: SignInButtonBuilder(
+                icon: Icons.person,
+                backgroundColor:
+                    _isLoading ? Colors.teal.withOpacity(0.3) : Colors.teal,
+                onPressed: () {
+                  if (_isLoading) {
+                    null;
+                  } else {
+                    try {
+                      _signInAnonymously();
+                    } on FirebaseAuthException catch (e) {
+                      _showMyDialog(
+                        "Something Went Wrong",
+                        '${e.message}',
+                        'Try Again',
+                      );
+                    }
+                  }
+                },
+                text: "Sign in Anonymously",
+              ),
+            ),
             SizedBox(height: 15),
             SignButton(
               buttonType: Buttons.Email,
@@ -92,9 +114,9 @@ class _SignInPageState extends State<SignInPage> {
                   null;
                 } else {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EmailSignInPage()));
+                    context,
+                    MaterialPageRoute(builder: (context) => EmailSignInPage()),
+                  );
                 }
               },
             ),
@@ -108,7 +130,7 @@ class _SignInPageState extends State<SignInPage> {
                   _signInWithGoogle();
                 }
               },
-            )
+            ),
           ],
         ),
       ),
@@ -116,7 +138,10 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future<void> _showMyDialog(
-      String title, String content, String buttonText) async {
+    String title,
+    String content,
+    String buttonText,
+  ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -124,11 +149,7 @@ class _SignInPageState extends State<SignInPage> {
         return AlertDialog(
           title: Text(title),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(content),
-              ],
-            ),
+            child: ListBody(children: <Widget>[Text(content)]),
           ),
           actions: <Widget>[
             ElevatedButton(
