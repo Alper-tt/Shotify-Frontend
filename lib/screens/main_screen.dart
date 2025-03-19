@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shotify_frontend/screens/sign_in_screen.dart';
+import 'package:shotify_frontend/screens/login_page.dart';
 import 'package:shotify_frontend/screens/settings_screen.dart';
 import 'history_screen.dart';
 import 'home_screen.dart';
@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
         if (snapshot.connectionState == ConnectionState.active) {
           User? user = snapshot.data;
           if (user == null) {
-            return SignInPage();
+            return LoginPage();
           }
           return Scaffold(
             body: screens[_selectedIndex],

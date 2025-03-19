@@ -49,10 +49,12 @@ class _SignInPageState extends State<SignInPage> {
             context,
             listen: false,
           ).signInWithGoogle();
+
       Provider.of<BackendAuthService>(
         context,
         listen: false,
       ).syncUserWithBackend(user!);
+
     } on FirebaseAuthException catch (e) {
       _showMyDialog("Something Went Wrong!", "${e.message}", 'Try Again');
     } finally {
