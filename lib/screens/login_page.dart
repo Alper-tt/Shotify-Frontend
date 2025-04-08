@@ -21,13 +21,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   Future<void> _signInAnonymously() async {
     final user =
-    await Provider.of<AuthService>(
-      context,
-      listen: false,
-    ).signInAnonymously();
+        await Provider.of<AuthService>(
+          context,
+          listen: false,
+        ).signInAnonymously();
 
     Provider.of<BackendAuthService>(
       context,
@@ -38,20 +37,18 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInWithGoogle() async {
     try {
       final user =
-      await Provider.of<AuthService>(
-        context,
-        listen: false,
-      ).signInWithGoogle();
+          await Provider.of<AuthService>(
+            context,
+            listen: false,
+          ).signInWithGoogle();
 
       Provider.of<BackendAuthService>(
         context,
         listen: false,
       ).syncUserWithBackend(user!);
-
     } on FirebaseAuthException catch (e) {
       _showMyDialog("Something Went Wrong!", "${e.message}", 'Try Again');
-    } finally {
-    }
+    } finally {}
   }
 
   formStatus _formStatus = formStatus.signIn;
@@ -62,11 +59,11 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: SingleChildScrollView(
           child:
-          _formStatus == formStatus.signIn
-              ? buildSignInForm()
-              : _formStatus == formStatus.register
-              ? buildRegisterForm()
-              : buildResetForm(),
+              _formStatus == formStatus.signIn
+                  ? buildSignInForm()
+                  : _formStatus == formStatus.register
+                  ? buildRegisterForm()
+                  : buildResetForm(),
         ),
       ),
     );
@@ -77,188 +74,171 @@ class _LoginPageState extends State<LoginPage> {
     TextEditingController _emailController = TextEditingController();
     TextEditingController _passwordController = TextEditingController();
     return SafeArea(
-        child: Center(
-          child: Form(
-            key: _signInFormKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 50),
+      child: Center(
+        child: Form(
+          key: _signInFormKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 50),
 
-                const Icon(
-                  Icons.lock,
-                  size: 100,
-                ),
+              const Icon(Icons.lock, size: 100),
 
-                const SizedBox(height: 50),
+              const SizedBox(height: 50),
 
-                Text(
-                  'Welcome back you\'ve been missed!',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
-                  ),
-                ),
+              Text(
+                'Welcome back you\'ve been missed!',
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+              ),
 
-                const SizedBox(height: 25),
+              const SizedBox(height: 25),
 
-                MyTextField(
-                  inputType: TextInputType.emailAddress,
-                  controller: _emailController,
-                  hintText: 'Email',
-                  obscureText: false,
-                  validator: (value) {
-                    if (!EmailValidator.validate(value!)) {
-                      return 'Invalid email address!';
-                    } else {
-                      null;
-                    }
-                  },
-                ),
+              MyTextField(
+                inputType: TextInputType.emailAddress,
+                controller: _emailController,
+                hintText: 'Email',
+                obscureText: false,
+                validator: (value) {
+                  if (!EmailValidator.validate(value!)) {
+                    return 'Invalid email address!';
+                  } else {
+                    null;
+                  }
+                },
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                // password textfield
-                MyTextField(
-                  inputType: TextInputType.visiblePassword,
-                  controller: _passwordController,
-                  hintText: 'Password',
-                  obscureText: true,
-                  validator: ((value) {
-                    if (value!.length < 6) {
-                      return 'Password must be at least 6 character';
-                    } else
-                      null;
-                  }),
-                ),
+              // password textfield
+              MyTextField(
+                inputType: TextInputType.visiblePassword,
+                controller: _passwordController,
+                hintText: 'Password',
+                obscureText: true,
+                validator: ((value) {
+                  if (value!.length < 6) {
+                    return 'Password must be at least 6 character';
+                  } else
+                    null;
+                }),
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        child: Text('Forgot Password?',
-                          style: TextStyle(
-                          ),),
-                        onPressed: () {
-                          setState(() {
-                            _formStatus = formStatus.reset;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // sign in button
-                MyButton(
-                  text: "Sign In",
-                  onTap: () async {
-                    if (_signInFormKey.currentState!.validate()) {
-                      try {
-                        final user = await Provider.of<AuthService>(
-                          context,
-                          listen: false,
-                        ).signInWithEmailAndPassword(
-                          _emailController.text,
-                          _passwordController.text,
-                        );
-
-                        Provider.of<BackendAuthService>(context, listen: false)
-                            .syncUserWithBackend(user!);
-
-                      } on FirebaseAuthException catch (e) {
-                        _showMyDialog(
-                          "Something Went Wrong!",
-                          '${e.message}',
-                          "Try Again",
-                        );
-                      }
-                    } else {
-                      _showMyDialog(
-                        "Something Went Wrong!",
-                        "",
-                        "Try Again"
-                      );
-                    }
-                  },
-                ),
-                const SizedBox(height: 50),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 50),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SquareTile(imagePath: 'assets/images/google.png'),
-
-                    SizedBox(width: 25),
-
-                    // apple button
-                    SquareTile(imagePath: 'assets/images/apple.png')
-                  ],
-                ),
-
-                const SizedBox(height: 50),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'Not a member?',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    const SizedBox(width: 4),
                     TextButton(
-                      child: Text('Register Now',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue
-                        ),),
+                      child: Text('Forgot Password?', style: TextStyle()),
                       onPressed: () {
                         setState(() {
-                          _formStatus = formStatus.register;
+                          _formStatus = formStatus.reset;
                         });
                       },
                     ),
                   ],
-                )
-              ],
-            ),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              // sign in button
+              MyButton(
+                text: "Sign In",
+                onTap: () async {
+                  if (_signInFormKey.currentState!.validate()) {
+                    try {
+                      final user = await Provider.of<AuthService>(
+                        context,
+                        listen: false,
+                      ).signInWithEmailAndPassword(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+
+                      Provider.of<BackendAuthService>(
+                        context,
+                        listen: false,
+                      ).syncUserWithBackend(user!);
+                    } on FirebaseAuthException catch (e) {
+                      _showMyDialog(
+                        "Something Went Wrong!",
+                        '${e.message}',
+                        "Try Again",
+                      );
+                    }
+                  } else {
+                    _showMyDialog("Something Went Wrong!", "", "Try Again");
+                  }
+                },
+              ),
+              const SizedBox(height: 50),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text(
+                        'Or continue with',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 50),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SquareTile(imagePath: 'assets/images/google.png', onTap: _signInWithGoogle,),
+                  SizedBox(width: 25),
+                  // apple button
+                  SquareTile(imagePath: 'assets/images/apple.png'),
+                ],
+              ),
+
+              const SizedBox(height: 50),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Not a member?',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton(
+                    child: Text(
+                      'Register Now',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _formStatus = formStatus.register;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 
@@ -277,19 +257,13 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               const SizedBox(height: 50),
 
-              const Icon(
-                Icons.lock,
-                size: 100,
-              ),
+              const Icon(Icons.lock, size: 100),
 
               const SizedBox(height: 50),
 
               Text(
                 'Hi, Welcome to Shotify!',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
 
               const SizedBox(height: 25),
@@ -354,14 +328,15 @@ class _LoginPageState extends State<LoginPage> {
                         _passwordController.text,
                       );
 
-                      Provider.of<BackendAuthService>(context, listen: false)
-                          .syncUserWithBackend(user!);
+                      Provider.of<BackendAuthService>(
+                        context,
+                        listen: false,
+                      ).syncUserWithBackend(user!);
 
                       setState(() {
                         _formStatus = formStatus.signIn;
                       });
-                    } else {
-                    }
+                    } else {}
                   } on FirebaseAuthException catch (e) {
                     _showMyDialog(
                       "Something Went Wrong!",
@@ -378,10 +353,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -391,10 +363,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
                     ),
                   ],
                 ),
@@ -404,13 +373,16 @@ class _LoginPageState extends State<LoginPage> {
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  SquareTile(imagePath: 'assets/images/google.png'),
+                children: [
+                  SquareTile(
+                    imagePath: 'assets/images/google.png',
+                    onTap: _signInWithGoogle
+                  ),
 
-                  SizedBox(width: 25),
+                  const SizedBox(width: 25),
 
                   // apple button
-                  SquareTile(imagePath: 'assets/images/apple.png')
+                  const SquareTile(imagePath: 'assets/images/apple.png'),
                 ],
               ),
 
@@ -425,19 +397,21 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(width: 4),
                   TextButton(
-                    child: Text('Sign In',
-                    style: TextStyle(
+                    child: Text(
+                      'Sign In',
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                      color: Colors.blue
-                    ),),
+                        color: Colors.blue,
+                      ),
+                    ),
                     onPressed: () {
                       setState(() {
                         _formStatus = formStatus.signIn;
                       });
                     },
-                    ),
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -456,21 +430,18 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              BackButton(onPressed: (){setState(() {
+                _formStatus = formStatus.signIn;
+              });}),
               const SizedBox(height: 50),
 
-              const Icon(
-                Icons.lock,
-                size: 100,
-              ),
+              const Icon(Icons.lock, size: 100),
 
               const SizedBox(height: 50),
 
               Text(
                 "Let's, reset your password!",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
 
               const SizedBox(height: 25),
@@ -514,8 +485,7 @@ class _LoginPageState extends State<LoginPage> {
                         "Try Again",
                       );
                     }
-                  } else {
-                  }
+                  } else {}
                 },
               ),
               const SizedBox(height: 50),
@@ -526,12 +496,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   Future<void> _showMyDialog(
-      String title,
-      String content,
-      String buttonText,
-      ) async {
+    String title,
+    String content,
+    String buttonText,
+  ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
