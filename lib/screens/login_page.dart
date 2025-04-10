@@ -82,13 +82,13 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               const SizedBox(height: 50),
 
-              const Icon(Icons.lock, size: 100),
+              const Icon(Icons.music_note, size: 100),
 
               const SizedBox(height: 50),
 
               Text(
                 'Welcome back you\'ve been missed!',
-                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                style: TextStyle(color: Colors.grey[500], fontSize: 16),
               ),
 
               const SizedBox(height: 25),
@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                   SquareTile(imagePath: 'assets/images/google.png', onTap: _signInWithGoogle,),
                   SizedBox(width: 25),
                   // apple button
-                  SquareTile(imagePath: 'assets/images/apple.png'),
+                  SquareTile(imagePath: 'assets/images/apple.png', onTap: _signInAnonymously,),
                 ],
               ),
 

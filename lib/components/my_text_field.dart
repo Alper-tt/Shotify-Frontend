@@ -22,6 +22,7 @@ class MyTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: TextFormField(
+        style: TextStyle(color: Colors.black),
         validator: validator,
         controller: controller,
         obscureText: obscureText,
@@ -36,7 +37,7 @@ class MyTextField extends StatelessWidget {
             fillColor: Colors.grey.shade200,
             filled: true,
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey[500])),
+            hintStyle: TextStyle(color: Colors.grey[500]),),
       ),
     );
   }
