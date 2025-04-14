@@ -54,7 +54,7 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
       _saveProgress = 0.0;
     });
 
-    int totalDurationInSeconds = 70;
+    int totalDurationInSeconds = 90;
     int elapsedSeconds = 0;
     _saveProgressTimer =
         Timer.periodic(const Duration(seconds: 1), (Timer timer) {
