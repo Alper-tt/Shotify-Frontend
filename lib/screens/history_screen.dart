@@ -128,7 +128,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "History ekranını görüntülemek için lütfen giriş yapın.",
+                  "Geçmiş ekranını görüntülemek için lütfen giriş yapın.",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 18),
                 ),
